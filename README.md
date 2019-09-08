@@ -5,6 +5,8 @@ UNC Chapel Hill departments of Biology, Physics and Astronomy, Applied Physical 
 Variety of code and scripts involving automating work flow
 Includes edits to Danuser TF code, matlab scripts to automate image analysis, FIJI macros to automate image massaging. 
 
+A small selection of sample images are included to facilate testing of scripts. 
+
     Copyright (C) <2019>  <Max Hockenberry>
 
     This program is free software: you can redistribute it and/or modify
