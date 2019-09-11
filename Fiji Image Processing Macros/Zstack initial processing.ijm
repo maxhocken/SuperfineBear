@@ -1,5 +1,33 @@
 /*
  * Macro template to process multiple images in a folder of the czi format. Dont mess within unless you know what you are doing. 
+ * Input:
+ * input folder of image stacks in three channels, in Zayna's case ph, Phalodin, DAPI
+ * Program will ask for input directory, then output, then suffix of the desired image files, default being tif, and a file pattern. For example, if one uses NULL
+ * as the pattern, only images containing NULL will be processed. 
+ *  * 
+ *  
+ * Each image will be extracted from the master image stacks, then have its Z projection take (only first channel, based on intensity). This image is then saved to the
+ * output directory. 
+ * 
+ * 
+ * Output:
+ * In output folder, single z projected images will be saved with original image name. 
+ * --Max Hockenberry 9 7 19
+ * 
+ * Copyright (C) <2019>  <Max Hockenberry>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #@ File (label = "Input directory", style = "directory") input

@@ -7,6 +7,8 @@ Includes edits to Danuser TF code provided under GPL, matlab scripts to automate
 
 Split into several parts; Area segmentation and automatic cell tracking based off of MATLAB's image processing toolbox, FIJI plugins specific to our image analysis pipeline, and other miscallenous scripts and code. 
 
+A small selection of sample images are included to facilate testing of scripts. 
+
     Copyright (C) <2019>  <Max Hockenberry>
 
     This program is free software: you can redistribute it and/or modify

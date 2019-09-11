@@ -1,0 +1,2 @@
+A number of dependencies and toolboxes are required to run this code. They are as follows:
+- Computer Vision Toolbox

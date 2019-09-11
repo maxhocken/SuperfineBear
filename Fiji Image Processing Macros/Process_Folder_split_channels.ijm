@@ -1,5 +1,28 @@
 /*
- * Macro to split all files in folder into channels
+ * Macro to split all files in folder into three channels channels, base of phase contrast, rfp, and gfp. Make sure input and output folders are not inside each other. 
+ * 
+ * Input:
+ * input folder of image stacks in three channels, 1 ph, 2 gfp, 3 rfp
+ * Program will ask for input directory, then output, then suffix of the desired image files, default being tif. 
+ *  * 
+ * Output:
+ * folders of each image stack with original image, then three sub folders with image sequence of each ph, gfp, and rfp. 
+ * --Max Hockenberry 9 7 19
+ * 
+ * Copyright (C) <2019>  <Max Hockenberry>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #@ File (label = "Input directory", style = "directory") input
