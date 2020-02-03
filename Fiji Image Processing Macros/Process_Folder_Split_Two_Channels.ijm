@@ -1,5 +1,5 @@
 /*
- * Macro to split all files in folder into two channels, base of phase contrast and rfp. Make sure input and output folders are not inside each other. 
+ * Macro to split all files in folder into two channels, base of phase contrast and rfp.
  * 
  * Input:
  * input folder of image stacks in two channels, 1 ph, 2 rfp
@@ -7,6 +7,8 @@
  *  * 
  * Output:
  * folders of each image stack with original image, then two sub folders with image sequence of each ph, and rfp. 
+ 
+ * We find that trying to save files in the same folder leads to saving IOexceptions. Make sure output and input folders are not inside each other
  * --Max Hockenberry 9 7 19
  * 
  * Copyright (C) <2019>  <Max Hockenberry>
