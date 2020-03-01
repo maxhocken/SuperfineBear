@@ -4,8 +4,9 @@
 % Input:
 %  - Input folder containing all matfiles and data produced by Danuser code
 % Output:
-%  - Saves a matfile structure with the following variables: pixel size, 
-%  image size, number of frames, traction map, and displacement map.
+%  - Saves a matfile structure in the working directory with the following 
+%  variables: pixel size, image size, number of frames, traction map, and 
+%  displacement map.
 %  --Luca Menozzi 02 29 20
 %   
 %   Copyright (C) <2020>  <Luca Menozzi>
