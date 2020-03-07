@@ -3,13 +3,13 @@ Scripts and code created in Superfine/Bear lab
 UNC Chapel Hill departments of Biology, Physics and Astronomy, Applied Physical Science and Lineberger Comprehensive Cancer Center
 
 Variety of code and scripts involving automating work flow in studies of cell motilty and traction force microscopy. 
-Includes edits to Danuser TF code provided under GPL, matlab scripts to automate image analysis, FIJI macros to automate image massaging and initial processing.
+Includes edits to Danuser TF code provided under GPL, matlab scripts to automate image analysis, FIJI macros to automate image massaging and initial processing. Basic TF post analysis code is provided. 
 
-Split into several parts; Area segmentation and automatic cell tracking based off of MATLAB's image processing toolbox, FIJI plugins specific to our image analysis pipeline, and other miscallenous scripts and code. 
+Split into several parts; Area segmentation and automatic cell tracking based off of MATLAB's image processing toolbox (Now in GUI form!), FIJI/matlab macros/scripts specific to our image analysis pipeline, and other misc scripts and code. 
 
 A small selection of sample images are included to facilate testing of scripts. 
 
-    Copyright (C) <2019>  <Max Hockenberry>
+    Copyright (C) <2020>  <Max Hockenberry>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

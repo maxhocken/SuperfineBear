@@ -73,10 +73,14 @@ function action(samplename, outputdir, imgname) {
 	run("Split Channels");
 	selectWindow("C1-" +imgname);
 	i = "C1-" +imgname;
+	resetMinAndMax();
+	run("Apply LUT", "stack");
 	run("Image Sequence... ", "format=TIFF name=i start=0 digits=3 save=["+ outputpath + "\\" +"ph" +"]");
 	close();
 	selectWindow("C2-" +imgname);
 	j = "C2-" +imgname;
+	resetMinAndMax();
+	run("Apply LUT", "stack");
 	run("Image Sequence... ", "format=TIFF name=j start=0 digits=3 save=["+ outputpath + "\\" + "rfp" +"]");
 	close();
 	
