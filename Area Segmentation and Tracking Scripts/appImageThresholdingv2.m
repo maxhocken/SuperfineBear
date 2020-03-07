@@ -2,10 +2,10 @@
 %%Script that will take input image and thresholds it to create a cell
 %%mask. Will calculate total area of cells in image and output as areas
 %%variable. Calculates centroids and outputs them as centroids variable.
-%%Adapted from the excellent tutorial: https://www.mathworks.com/help/images/detecting-a-cell-using-image-segmentation.html
+%Adapted from the tutorial at: https://www.mathworks.com/help/images/detecting-a-cell-using-image-segmentation.html
 %
 % Input:
-%  - Image file passed by CellMaskGenerator.m
+%  - Image file, fudgeFactor, cell size, edge elimination pixel amount
 %   Functionally the script thresholds using a sobel method from the matlab
 %   image analysis toolbox, dilates the obtained threshold, then fills in
 %   image holes. Finally it smooths the object before determining centroid
@@ -24,13 +24,9 @@
 %  adjusted sample by sample. You can find image area by the usual methods
 %  in FIJI in order to define the lower and upper bound of kept objects. 
 % Output:
-%  -  area: pixel area of created masks in microns as calculated by
-%  provided resolution hardcoded at bottom of script. 
-%  -  mask: binary image file of the cell mask.
-%  -  centroids: matlab structure containing all centroid values for masked
-%  objects in x,y format. 
-%  -  stats: matlab structure contining all centroid valeus and area values for masked objects
-%  in a table format (n x 2). Outputted to statstable object in Cellareascript 
+%  -  Mask: binary image file of the cell mask.
+%  -  Boundary: Boundary pixels of the mask
+%
 %
 %  --Max Hockenberry 3 6 20
 %   
@@ -50,12 +46,8 @@
 % along with this program.  If not, see <https://www.gnu.org/licenses/>.
 % 
 % 
-
-
-
-
 %%
-function [area,mask,centroids,stats] = ImageThresholdingv2(image,fudgefactor,cellsize,mmelim)
+function [maskedimage, maskbound] = appImageThresholdingv2(image,fudgeFactor,cellsize,mmelim)
 %Cell segmentation and area analysis program
 %Works by thresholding the image. You can adjust the fudgeFactor to make it
 %more or less sensitive to changes in contrast. You can also change the
@@ -64,20 +56,25 @@ function [area,mask,centroids,stats] = ImageThresholdingv2(image,fudgefactor,cel
 
 %Read image
 I = imread(image);
+
 %Detect Entire Cell
 [~,threshold] = edge(I,'sobel');
 
-%Edge detection
-BWs = edge(I,'sobel',threshold * fudgefactor);
-%imshow(BWs)
+%%%%%%
+%fudgeFactor = 0.90;
+%%%%%%
 
+BWs = edge(I,'sobel',threshold * fudgeFactor);
+
+%If edge elimination is provided, mask the edges of the image by mmelim
+%pixels
 elimmask = zeros(size(BWs));
 
 elimmask(mmelim+1:end-mmelim,mmelim+1:end-mmelim) = 1;
 BWs = BWs.*elimmask;
 
 %This becomes double format for some reason, probably because we are
-%subscripting it. Change it back to double before proceeding. 
+%subscripting it. Change it back to logical before proceeding. 
 
 BWs = logical(BWs);
 
@@ -85,28 +82,26 @@ BWs = logical(BWs);
 se90 = strel('line',3,90);
 se0 = strel('line',3,0);
 
-
 BWsdil = imdilate(BWs,[se90 se0]);
 
-%If image has white around edges the fill function can often cause the
-%entire image to be 'masked'. Optional clear border step here
-%BWsdil = imclearborder(BWsdil,2);
-
-%Fill Interior Gaps
+%Step 4: Fill Interior Gaps
 BWdfill = imfill(BWsdil,'holes');
 
-%Option to clear objects on the border below if desired
+%Step 5: Remove Connected Objects on Border. Elected to keep the images on
+%the border. 
 BWnobord = BWdfill; %imclearborder(BWdfill,4);
 
-%Smooth the Object
-seD = strel('diamond',1);
+%Step 6: Smooth the Object
+seD = strel('diamond',2);
 BWfinal = imerode(BWnobord,seD);
 BWfinal = imerode(BWfinal,seD);
 
+%Step 6.5: 
+
+%BWfinal=bwareafilt(BWfinal,[200,100000]);
 BWfinal=bwareafilt(BWfinal,cellsize);
-%cellSize
-%Identify regions that are not connected and calculate area and
-%centroids seperately. 
+
+%Compute region properties 
 centroids = regionprops(BWfinal, 'centroid');
 
 stats = regionprops('table',BWfinal, 'Area', 'Centroid');
@@ -114,4 +109,9 @@ stats = regionprops('table',BWfinal, 'Area', 'Centroid');
 %Output the mask and the area (currently in pixels)
 area=bwarea(BWfinal);
 mask=BWfinal;
+
+maskbound = bwboundaries(mask);
+convermask = uint16(mask);
+maskedimage = I.*convermask;
+
 end
