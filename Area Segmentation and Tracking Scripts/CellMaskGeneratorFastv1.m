@@ -1,3 +1,4 @@
+%CellMaskGeneratorFastv1.m
 %%Script that will take input folder and calculate cell areas for all
 %%.tif files. Creates cellular masks as well as calculates cell centroids.
 % Input:
@@ -9,7 +10,7 @@
 %  of those cells similarly. Masks as well as centroid csvs are outputed
 %  into subdirectories of the queried output folder as Masks and Tracking
 %  respectively. 
-%  --Max Hockenberry 12 30 19
+%  --Max Hockenberry 3 5 20
 %   
 %   Copyright (C) <2019>  <Max Hockenberry>
 % 
@@ -37,6 +38,7 @@ outputpath = uigetdir;
 % Make subdirectories in output folder
 mkdir(outputpath, 'Masks')
 mkdir(outputpath, 'Tracking') 
+mkdir(outputpath, 'Boundaries')
 
 % Specify the folder where the files live.
 myFolder = folderpath;
@@ -56,6 +58,10 @@ areas = cell(numel(theFiles),2);
 centroids = cell(numel(theFiles),2);
 statstable = cell(numel(theFiles),2);
 
+maskoutpath = convertStringsToChars(convertCharsToStrings(outputpath) + '\Masks');
+%make container to hold masks
+
+iMasks = cell(numel(theFiles),1);
 for k = 1 : numel(theFiles)
   baseFileName = theFiles(k).name;
   fullFileName = fullfile(myFolder, baseFileName);
@@ -66,75 +72,14 @@ for k = 1 : numel(theFiles)
   
   fprintf(1, 'Now reading %s\n', fullFileName);
   % calculate area of cell using area script and centroid
-  [areas{k,2},mask,centroids{k,2},statstable{k,2}]=ImageThresholdingv1(fullFileName);
-  
-  
-  % Add centroids to image from statstable. 
-  
-  imageArray = imread(fullFileName);
-  
-  %imshow(imageArray)
-  %Get boundary from mask for comparison. 
-  maskbound = bwboundaries(mask);
-  %maskbound = maskbound{1,1};
-  
-  %Some options to compare original to mask. 
-  %composite=imfuse(imageArray,maskbound,'falsecolor');
-  %composite=imfuse(imageArray,mask,'blend');
-  %imshow(imageArray);
-  %imshow(mask);  % Display image.
-  %imshow(composite);
-  %drawnow;
-  %imshow(mask);
-  
-  %Setup tablet of stats
-  centtable = statstable{k,2};
-  centcoords = centtable.Centroid;
-  hold on 
+  [areas{k,2},mask,centroids{k,2},statstable{k,2}]=ImageThresholdingv2(fullFileName);
    
-  texthld = zeros(height(centtable),1);
-  %disp(texthld)
-  markimage=double(mask);
-  
-  %Place number at centroid positions
-  for i = 1:numel(texthld)
-      %disp(i)
-      test = int2str(i);
-      %texthld(i,1) = test;
-      %disp(texthld(i))
-      %display(centcoords(i,1));
-      markimage = insertText(markimage,[centcoords(i,1) centcoords(i,2)], test);          
-  end
-  
-  %Plot the boundary around the image for comparison.
-  figure
-  imshow(fullFileName)
-  hold on
-  %loop through boundaries and plot
-  for i = 1:numel(maskbound)
-      curbound = maskbound{i,1};
-      plot(curbound(:,2),curbound(:,1));
-  end
-  
-%  saveas(gcf,convertCharsToStrings(baseFileName) + 'comp' +'.png')
-%  close
-  
-%  Save the output marked image in Masks folder
-   pngout = convertCharsToStrings(baseFileName) + '.png';
+%  Save the output marked image in Masks folder as png
+   pngout = convertCharsToStrings(maskoutpath) + '\' + baseFileName(1:end-4) + '.png';
 
-   saveas(gcf,pngout)
-   drawnow; % Force display to update immediately.
-   close
-   %move png to outputfolder
-   pngout = convertStringsToChars(pngout);
-   maskoutpath = convertStringsToChars(convertCharsToStrings(outputpath) + '\Masks');
-   movefile(pngout, maskoutpath)
-  
-   %Write centtable to csv file with name as the frame. Will include areas
-   %and the coordinates. 
-   csvout = strcat(baseFileName, '.csv');
-   writetable(centtable,csvout)
-   trackoutpath = convertStringsToChars(convertCharsToStrings(outputpath) + '\Tracking');
-   movefile(csvout, trackoutpath)
+   imwrite(mask,char(pngout))
+   iMasks{k} = mask;
    
 end
+
+save(convertCharsToStrings(outputpath) + '\iMasks.mat', 'iMasks');

@@ -27,7 +27,7 @@
 % 
 % 
 %%
-function [tracks, adjacency_tracks, averagevel] = TrackCells(points)
+function [tracks, adjacency_tracks, averagevel,storepoints] = TrackCells(points)
 %TrackCells: Given an input of centroid positions, will recapitulate the 
 % tracks using simpletracker
 %   points must be matlab cell array object containing xy points in
@@ -51,6 +51,8 @@ all_points = vertcat(points{:});
 
 averagevel = zeros(numel(n_tracks),1);
 
+
+storepoints = cell(numel(n_tracks),1);
 for i_track = 1 : n_tracks
    
     % We use the adjacency tracks to retrieve the points coordinates. It
@@ -60,6 +62,10 @@ for i_track = 1 : n_tracks
     track_points = all_points(track, :);
     
     plot(track_points(:,1), track_points(:, 2), 'Color', colors(i_track, :))
+    xvals = track_points(:,1);
+    yvals = track_points(:,2);
+    points = [xvals,yvals];
+    storepoints{i_track,1} = points;
     hold on
 
     %Average Velocity
