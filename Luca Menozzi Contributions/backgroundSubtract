@@ -39,8 +39,7 @@ structure = dir(img_directory);
 cell = struct2cell(structure);
 [rows , cols] = size(cell);
 ref_image_name = cell{1, cols};
-raw_ref = Tiff(ref_image_name,'r');
-ref_image_data = read(raw_ref);
+ref_image_data = imread(ref_image_name);
 
 % Smooth reference image
 smoothed_ref = imgaussfilt(ref_image_data, smoothing_factor);
@@ -57,8 +56,7 @@ for i = image_index_array
     % Read and smooth image of interest in this iteration (smooth using
     % 2D Gauss Filter)
     img_name = cell{1, i};
-    raw_img = Tiff(img_name, 'r');
-    raw_img_data = read(raw_img);
+    raw_img_data = imread(img_name);
     smoothed_img_data = imgaussfilt(raw_img_data, smoothing_factor);
     
     % Subtract reference image from image of interest in both raw and
@@ -71,13 +69,14 @@ for i = image_index_array
     raw_filename = strcat('subtracted', img_name);
     
     % Show both smoothed and raw subtracted images
+    %{
     figure
     imshow(final_image_raw)
     title(raw_filename)
     figure
     imshow(final_image_smoothed)
     title(smoothed_filename)
-    
+    %}
     % Change to output directory and save the new image files
     cd(final_dir);
     imwrite(final_image_smoothed, smoothed_filename);
