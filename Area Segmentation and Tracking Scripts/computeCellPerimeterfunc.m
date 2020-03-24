@@ -27,11 +27,10 @@ function [] = computeCellPerimeterfunc(inputpath)
 
 
 
-%Open displacement and traction maps and Mask
+%Open ask
 
 load(convertCharsToStrings(inputpath) + '\iMasks.mat')
 
-%Initialize strain energy holder based on traction field size (one per map)
 unitconvert = (441*1e-9)^2 * 1e12; %This is dependent on microscope pixel size
 %outputs area in microns
 
@@ -40,9 +39,10 @@ cellPerim = zeros(length(iMasks),1);
 for i = 1:numel(iMasks)
     curMask = iMasks{i,1};
     
-    %Get cell spread area from mask
-     Perims = regionprops(curMask,'perimeter');
-     cellPerim(i,1) = Perims.Perimeter;
+    %Get cell perimeter from mask
+     Perims = bwperim(curMask,8);
+     %imshow(Perims)
+     cellPerim(i,1) = sum(sum(Perims));
 
 end
 %We can look at the correlation between strainEnergy and CellArea here. 

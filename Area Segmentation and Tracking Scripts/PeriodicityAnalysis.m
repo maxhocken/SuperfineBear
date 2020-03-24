@@ -1,6 +1,8 @@
 %'I:\Dropbox\SuperfineBear Lab\Raw data\ARP23 tests\020620 JR20 Parental 40
 %kPa\split\2 6 20 JR20 Parental 40 kPa_11_20.tif'
 
+%FIX THIS for tomorrow
+
 %Script to test various methods of analyzing periodic behaviour from cell
 %SED data (to start) and correlate with other metrics. 
 close all

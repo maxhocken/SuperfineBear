@@ -39,12 +39,16 @@ for i = 1:numel(subfolders)
   end
     
 end
-
 %Now run the code for everything in the subfolders. 
 
 %Create cell array to store resulting data to combine later
 
 dataExport = cell(1,numel(subfolders));
+
+%Define Column Headers
+cHeaders = {'Frame', 'Strain Energy', 'Strain Energy Density',...
+    'Average Traction', 'Net Contractile Moment', 'Cell Velocity', 'Cell Area',...
+    'Cell Perimeter'};
 for i = 1:numel(subfolders)
    cursubfolder = subfolders{1,i};
    fulldirectory = strcat(inputfolder,'\',cursubfolder);
@@ -95,6 +99,12 @@ for i = 1:numel(subfolders)
            else
                computeCellVelfunc(fulldirectory);
            end
+           
+           if isfile(strcat(fulldirectory,'cellPerimeters.mat'))
+               
+           else
+               computeCellPerimeterfunc(fulldirectory);
+           end
            %Load back the strain energydensities,cellAreas and the average tractions
            %and export averages as csv, as well as periodic data
            load(strcat(fulldirectory,'\AverageTraction.mat'))
@@ -103,6 +113,7 @@ for i = 1:numel(subfolders)
            load(strcat(fulldirectory,'\StrainEnergies.mat'))
            load(strcat(fulldirectory,'\netContractileMoments.mat'))
            load(strcat(fulldirectory,'\cellVelocities.mat'))
+           load(strcat(fulldirectory,'\cellPerimeters.mat'))
            frames = transpose(1:numel(AverageTraction));
            %convert NCM to double
            cMoments = cell2mat(cMoments);
@@ -111,12 +122,17 @@ for i = 1:numel(subfolders)
            %compile the results into a table to export as a csv for excel
            %load each of the data sets and set to dataExport
 
-           data = horzcat(frames,strainEnergies,strainEnergiesDensities,AverageTraction,cMoments,cellVel,cellArea);
-           dataExport{1,i} = data;
+           data = horzcat(frames,strainEnergies,strainEnergiesDensities,AverageTraction,cMoments,cellVel,cellArea,cellPerim);
+           dataColumns = numel(data(1,:));
+           %Add header, make into cell array to handle mixed data
+           data2 = cell(numel(cMoments)+1,dataColumns);
+           data2(1,:) = cHeaders;
+           data2(2:end,:) = num2cell(data);
+           dataExport{1,i} = data2;
 
            %go ahead and export this as a csv as well
 
-           csvwrite(strcat(fulldirectory,'\compiledData.csv'),data);
+           xlswrite(strcat(fulldirectory,'\compiledData.xlsx'),data2);
            %Horzcat will fail when the matrices do not have the same vertical
            %length as will happen with our data. So we use cell array
            %dataExport = horzcat(dataExport,data);
@@ -129,10 +145,16 @@ for i = 1:numel(subfolders)
        disp('ignoring...')
    end
 end
+
+%Concatenates each set of data next to each other. Need to strip header and
+%convert back into double array to compute averages. 
 export = [];
 %save data export as csv 
 for k = 1:numel(dataExport)
    curData = dataExport{1,k};
+   %Remove Header
+   curData = curData(2:end,:);
+   curData = cell2mat(curData);
 
    %We need to remove nan values from the data set and replace them with
    %something reasonable. 
@@ -143,17 +165,17 @@ for k = 1:numel(dataExport)
 %    d=[b;zeros(z(1)-s(1),1)]; % concatenate the smaller with zeros
 %    c=[a,d]; % catenate the two vectors
    
-   export = padconcatenation(export,dataExport{1,k},2);
+   export = padconcatenation(export,curData,2);
 end
 
-csvwrite(strcat(inputfolder,'\data.csv'),export);
+xlswrite(strcat(inputfolder,'\data.csv'),export);
 
 %Compute averages for each column and export as csv
 
 averageExport = nanmean(export);
 %Reshape into rows with every three columns being a row
 
-averageExport = reshape(averageExport,7,[]);
+averageExport = reshape(averageExport,dataColumns,[]);
 averageExport = averageExport.';
 
 %Go ahead and set the first value in each column to be equal to the movie
@@ -161,7 +183,13 @@ averageExport = averageExport.';
 
 averageExport(:,1) = 1:numel(averageExport(:,1));
 
-csvwrite(strcat(inputfolder,'\averagedata.csv'),averageExport);
+%Now add back in a header and export as xlsx file
+cHeaders{1,1} = 'Movie';
+averageExport2 = cell(length(averageExport)+1,dataColumns);
+averageExport2(1,:) = cHeaders;
+averageExport2(2:end,:) = num2cell(averageExport);
+
+xlswrite(strcat(inputfolder,'\averagedata.xlsx'),averageExport2);
 
 
 function [subDirsNames] = GetSubDirsFirstLevelOnly(parentDir)
