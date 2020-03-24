@@ -185,7 +185,7 @@ averageExport(:,1) = 1:numel(averageExport(:,1));
 
 %Now add back in a header and export as xlsx file
 cHeaders{1,1} = 'Movie';
-averageExport2 = cell(length(averageExport)+1,dataColumns);
+averageExport2 = cell(size(averageExport,1)+1,dataColumns);
 averageExport2(1,:) = cHeaders;
 averageExport2(2:end,:) = num2cell(averageExport);
 

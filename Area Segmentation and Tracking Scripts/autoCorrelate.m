@@ -23,8 +23,11 @@ short = mean(diff(lcsh))/fs;
 subplot(2,1,1)
 plot(lags/fs,autocor)
 hold on
+if isnan(short)
+   short = 0; 
+end
 [pklg,lclg] = findpeaks(autocor, ...
-    'MinPeakDistance',ceil(short)*fs,'MinPeakheight',0.2);
+    'MinPeakDistance',(ceil(short)*fs),'MinPeakheight',0.2);
 long = mean(diff(lclg))/fs;
 
 

@@ -1,7 +1,7 @@
 %'I:\Dropbox\SuperfineBear Lab\Raw data\ARP23 tests\020620 JR20 Parental 40
 %kPa\split\2 6 20 JR20 Parental 40 kPa_11_20.tif'
 
-%Wrap in function
+%FIX THIS for tomorrow
 
 %Script to test various methods of analyzing periodic behaviour from cell
 %SED data (to start) and correlate with other metrics. 
@@ -22,11 +22,10 @@ data = xlsread(datapath);
 % strainNCMdata = csvread(strainNCMdatapath);
 % sedTFareadata = csvread(sedTFareadatapath);
 
-%Fix nans in data sets 
-
-%for now with 0's, strip rows with zeros
-data(isnan(data)) = 0;
-data = data(all(data,2),:);
+% %Fix nans in data sets 
+% %for now with 0's, strip rows with zeros
+% strainNCMdata(isnan(strainNCMdata)) = 0;
+% strainNCMdata = strainNCMdata(all(strainNCMdata,2),:);
 % sedTFareadata(isnan(sedTFareadata)) = 0;
 % sedTFareadata = sedTFareadata(all(sedTFareadata,2),:);
 % %Find cutoff where data plumets to 0 due to relax state concatentation
@@ -123,7 +122,7 @@ figure
 [TFlong, TFshort] = autoCorrelate(frames,TFdata);
 title('Traction Force Periodicity')
 %Area
-Areadata = data(1:endframe,7);
+Areadata = data(1:endframe,2);
 figure
 
 [Arealong, Areashort] = autoCorrelate(frames,Areadata);
@@ -135,20 +134,8 @@ figure
 [SElong, SEshort] = autoCorrelate(frames,SEdata);
 title('Strain Energy Periodicity')
 %NCM
-NCMdata = data(1:endframe,5);
+NCMdata = strainNCMdata(1:endframe,3);
 figure
 
 [NCMlong, NCMshort] = autoCorrelate(frames,NCMdata);
 title('Net Contractile Moment Periodicity')
-%Perimeter
-Perimdata = data(1:endframe,8);
-figure
-
-[Perimlong, Perimshort] = autoCorrelate(frames,Perimdata);
-title('Perimeter Periodicity')
-%Cell velocity
-Veldata = data(1:endframe,6);
-figure
-
-[Vellong, Velshort] = autoCorrelate(frames,Veldata);
-title('Cell Velocity Periodicity')
