@@ -45,6 +45,7 @@ end
 %Create cell array to store resulting data to combine later
 
 dataExport = cell(1,numel(subfolders));
+dataExport2 = cell(1,numel(subfolders));
 for i = 1:numel(subfolders)
    cursubfolder = subfolders{1,i};
    fulldirectory = strcat(inputfolder,'\',cursubfolder);
@@ -58,6 +59,10 @@ for i = 1:numel(subfolders)
        
        %Check if iMasks exists
        if isfile(strcat(curFolder,'\iMasks.mat'))
+%            computeNetContractileMomentfunc(fulldirectory);
+%            computeStrainEnergyDensityfunc(fulldirectory);
+%            computeAverageTractionForcefunc(fulldirectory); 
+%            computeCellAreasfunc(fulldirectory);
 
            
            %check to see if these have already been processed. If not
@@ -74,7 +79,30 @@ for i = 1:numel(subfolders)
                computeStrainEnergyDensityfunc(fulldirectory);
            end
            
-           %Compute Strain Energy Density and cell spread area from masks
+           if isfile(strcat(fulldirectory,'\AverageTraction.mat'))
+               
+           else
+               computeAverageTractionForcefunc(fulldirectory); 
+           end
+           
+           if isfile(strcat(fulldirectory,'cellArea.mat'))
+               
+           else
+               computeCellAreasfunc(fulldirectory);
+           end
+           
+           %Load back the strain energydensities,cellAreas and the average tractions
+           %and export averages as csv, as well as periodic data
+           load(strcat(fulldirectory,'\AverageTraction.mat'))
+           load(strcat(fulldirectory,'\StrainEnergyDensities.mat'))
+           load(strcat(fulldirectory,'\cellArea.mat'))
+           frames = transpose(1:numel(AverageTraction));
+           data2 = horzcat(frames,strainEnergiesDensities,AverageTraction,cellArea);
+           dataExport2{1,i} = data2;
+
+           %go ahead and export this as a csv as well
+
+           csvwrite(strcat(fulldirectory,'\compiledSEDandTractiondata.csv'),data2);
            
 
 
@@ -102,10 +130,12 @@ for i = 1:numel(subfolders)
        disp('ignoring...')
    end
 end
-export=[];
+export = [];
+export2 = [];
 %save data export as csv 
 for k = 1:numel(dataExport)
    curData = dataExport{1,k};
+   curData2 = dataExport{1,k};
    %We need to remove nan values from the data set and replace them with
    %something reasonable. 
    
@@ -116,26 +146,30 @@ for k = 1:numel(dataExport)
 %    c=[a,d]; % catenate the two vectors
    
    export = padconcatenation(export,dataExport{1,k},2);
+   export2 = padconcatenation(export2,dataExport2{1,k},2);
 end
 
 csvwrite(strcat(inputfolder,'\data.csv'),export);
+csvwrite(strcat(inputfolder,'\data2.csv'),export2);
 
 %Compute averages for each column and export as csv
 
 averageExport = nanmean(export);
-
+averageExport2 = nanmean(export2);
 %Reshape into rows with every three columns being a row
 
 averageExport = reshape(averageExport,3,[]);
 averageExport = averageExport.';
 
+averageExport2 = reshape(averageExport2,4,[]);
+averageExport2 = averageExport2.';
 %Go ahead and set the first value in each column to be equal to the movie
 %number as average frame is useless.
 
 averageExport(:,1) = 1:numel(averageExport(:,1));
-
+averageExport2(:,1) = 1:numel(averageExport2(:,1));
 csvwrite(strcat(inputfolder,'\averagedata.csv'),averageExport);
-
+csvwrite(strcat(inputfolder,'\averageSEDTFdata.csv'),averageExport2);
 
 function [subDirsNames] = GetSubDirsFirstLevelOnly(parentDir)
 % Get a list of all files and folders in this folder.

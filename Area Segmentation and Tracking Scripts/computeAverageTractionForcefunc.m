@@ -1,8 +1,8 @@
-function [] = computeStrainEnergyDensityfunc(inputpath)
-%computeStrainEnergyDensityfunc Function handle which computes Strain
-%Energy Density
+function [] = computeAverageTractionForcefunc(inputpath)
+%computeAverageTractionForcefunc Function handle which computes Average
+%traction force from Danuser output
 %   Passed the input directory containing tractionforce folders and compute
-%   StrainEnergyDensity from specified TFM files. It should also need the
+%   Average Traction force from specified TFM files. It should also need the
 %   information from the .mat file containing the movie specifics like
 %   pixel size to accurately compute area from pixels. 
 %Strain Energy density 
@@ -26,25 +26,21 @@ function [] = computeStrainEnergyDensityfunc(inputpath)
 
 %Output: Strain Energy density
 
-
-%U = 1/2 * Integral(T dot u dxdy)
-
-%Open displacement and traction maps and Mask
+%Open traction maps and Mask
 
 load(convertCharsToStrings(inputpath) + '\iMasks.mat')
 load(convertCharsToStrings(inputpath) + '\TFMPackage\forceField\tractionMaps.mat')
-load(convertCharsToStrings(inputpath) + '\TFMPackage\displacementField\dispMaps.mat')
+
 
 %Initialize strain energy holder based on traction field size (one per map)
-unitconvert = (441*1e-9)^3 * 1e15; %This is dependent on what the units of tMap and dMap are, basically the size of each pixel
-%in. Need to confirm dimensions but want to output in fJ = 1e15 Nm
-strainEnergies = zeros(length(dMap),1);
-strainEnergiesDensities = zeros(length(dMap),1);
+
+AverageTraction = zeros(length(tMap),1);
+
 %loop through the loaded fields and compute strain energy
-cellArea = zeros(length(dMap),1);
-for i = 1:numel(strainEnergies)
+cellArea = zeros(length(tMap),1);
+for i = 1:numel(AverageTraction)
     curTmap = tMap{1,i};
-    curUmap = dMap{1,i};
+    
     curMask = iMasks{i,1};
     
     %Get cell spread area from mask
@@ -56,22 +52,17 @@ for i = 1:numel(strainEnergies)
     curMask = imdilate(curMask,SE);
     
     
-    %Compute Strain Energy
-    curStrainEnergy = 0.5 * unitconvert * sum(sum(curTmap.*curUmap.*curMask));
-    strainEnergies(i,1) = curStrainEnergy;
-    
-    %Compute Strain Energy density
-    curStrainEnergyDensity = curStrainEnergy/cellArea(i,1);
-    strainEnergiesDensities(i,1) = curStrainEnergyDensity;
+    %Compute Average Traction without zeros, so sum divided by count
+    %without zero
+    curAverageTraction = mean(nonzeros(curTmap.*curMask));
+    AverageTraction(i,1) = curAverageTraction;
+
 end
 %We can look at the correlation between strainEnergy and CellArea here. 
 %[rho, pval] = corr(strainEnergies,cellArea);
 
 %save strain energies
-save(convertCharsToStrings(inputpath) + '\StrainEnergies.mat', 'strainEnergies');
-
-%save strain energy densities
-save(convertCharsToStrings(inputpath) + '\StrainEnergyDensities.mat', 'strainEnergiesDensities');
+save(convertCharsToStrings(inputpath) + '\AverageTraction.mat', 'AverageTraction');
 
 end
 
