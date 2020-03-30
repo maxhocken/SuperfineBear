@@ -27,18 +27,7 @@ inputfolder = uigetdir;
 
 % Get a list of all files and folders in this folder.
 subfolders = GetSubDirsFirstLevelOnly(inputfolder);
-% Remove any subfolder that does not contain iMasks
-for i = 1:numel(subfolders)
-  curFolder = strcat(inputfolder,'\',subfolders{1,i});
-  
-  %Check if iMasks exists
-  if isfile(strcat(curFolder,'\iMasks.mat'))
-      
-  else
-      
-  end
-    
-end
+
 %Now run the code for everything in the subfolders. 
 
 %Create cell array to store resulting data to combine later
@@ -59,13 +48,15 @@ for i = 1:numel(subfolders)
    
    if isfile(strcat(fulldirectory,'\TFMPackage\forceField\forceField.mat'))
        
-       
        %Check if iMasks exists
-       if isfile(strcat(curFolder,'\iMasks.mat'))
+       if isfile(strcat(fulldirectory,'\iMasks.mat'))
+           
 %            computeNetContractileMomentfunc(fulldirectory);
 %            computeStrainEnergyDensityfunc(fulldirectory);
 %            computeAverageTractionForcefunc(fulldirectory); 
 %            computeCellAreasfunc(fulldirectory);
+%            computeCellVelfunc(fulldirectory);
+%            computeCellPerimeterfunc(fulldirectory);
 
            
            %check to see if these have already been processed. If not
@@ -190,14 +181,3 @@ averageExport2(1,:) = cHeaders;
 averageExport2(2:end,:) = num2cell(averageExport);
 
 xlswrite(strcat(inputfolder,'\averagedata.xlsx'),averageExport2);
-
-
-function [subDirsNames] = GetSubDirsFirstLevelOnly(parentDir)
-% Get a list of all files and folders in this folder.
-files    = dir(parentDir);
-names    = {files.name};
-% Get a logical vector that tells which is a directory.
-dirFlags = [files.isdir] & ~strcmp(names, '.') & ~strcmp(names, '..');
-% Extract only those that are directories.
-subDirsNames = names(dirFlags);
-end

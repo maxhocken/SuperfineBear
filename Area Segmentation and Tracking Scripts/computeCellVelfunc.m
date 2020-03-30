@@ -32,7 +32,13 @@ cellVel = zeros(length(iMasks),1);
 cellCent = cell(length(iMasks),1);
 firstMask = iMasks{1,1};
 firstCent = regionprops(firstMask,'centroid');
-firstCent = firstCent.Centroid;
+%Put in condition if there is no first object
+if isempty(firstCent)
+    firstCent = [0,0];
+else
+    firstCent = firstCent.Centroid;
+end
+
 cellCent{1,1} = firstCent;
 cellVel(1,1) = 0;
 for i = 2:numel(iMasks)

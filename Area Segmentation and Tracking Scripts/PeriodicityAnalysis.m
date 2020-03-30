@@ -1,7 +1,7 @@
 %'I:\Dropbox\SuperfineBear Lab\Raw data\ARP23 tests\020620 JR20 Parental 40
 %kPa\split\2 6 20 JR20 Parental 40 kPa_11_20.tif'
 
-%Wrap in function
+%Wrap in function in order to automate analysis more readily. 
 
 %Script to test various methods of analyzing periodic behaviour from cell
 %SED data (to start) and correlate with other metrics. 
@@ -13,8 +13,6 @@ inputfolder = uigetdir;
 datapath = strcat(inputfolder,'\compiledData.xlsx');
 data = xlsread(datapath);
 %xlsread strips header for us and data is outputted as double. 
-
-
 
 % strainNCMdatapath = strcat(inputfolder,'\compiledData.csv');
 % sedTFareadatapath = strcat(inputfolder,'\compiledSEDandTractiondata.csv');
@@ -109,7 +107,7 @@ ylabel('Autocorrelation')
 hold off
 
 
-%Do some auto correlations on other data sets
+%Do some auto correlations
 %SED
 SEDdata = data(1:endframe,3);
 figure
