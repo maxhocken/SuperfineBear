@@ -18,7 +18,7 @@ yvalsnorm = smoothdata(yvalsnorm);
 fs = 1/(xvals(2) - xvals(1));
 
 [autocor,lags] = xcorr(yvalsnorm,round(xvals(end)*fs),'coeff');
-[pksh, lcsh] = findpeaks(autocor);
+[pksh, lcsh] = findpeaks(autocor, 'MinPeakheight',0.2);
 short = mean(diff(lcsh))/fs;
 subplot(2,1,1)
 plot(lags/fs,autocor)
@@ -27,7 +27,7 @@ if isnan(short)
    short = 0; 
 end
 [pklg,lclg] = findpeaks(autocor, ...
-    'MinPeakDistance',(ceil(short)*fs),'MinPeakheight',0.2);
+    'MinPeakDistance',(ceil(short)*fs),'MinPeakheight',0.25);
 long = mean(diff(lclg))/fs;
 
 
