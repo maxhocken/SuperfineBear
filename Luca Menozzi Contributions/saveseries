@@ -1,0 +1,43 @@
+%Dependency of extract_czi_data
+%%Function that will concatenate and save the series
+%%planes into one tiff image
+% Input:
+%  - structure containing all planes
+%  - number of pixels in x axis
+%  - number of pixels in y axis
+%  - number of z stacks
+%  - number of channels
+% Output:
+%  - Saves a tiff file in the operating folder.
+%  --Luca Menozzi 05 05 20
+%   
+%   Copyright (C) <2020>  <Luca Menozzi>
+% 
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see <https://www.gnu.org/licenses/>.
+% 
+% 
+%%
+function [serie] = saveseries(in_series, x_pixels, y_pixels, num_zstacks, num_channels)
+
+serie = zeros(x_pixels, y_pixels, num_zstacks, num_channels, 'uint8');
+index = 1;
+for i = 1:1:num_zstacks
+    for j = 1:1:num_channels
+        name = strcat('C', num2str(i), 'Z', num2str(j));
+        serie(:,:,i,j) = in_series{index, 1};
+        index = index + 1;
+    end
+end
+    
+bfsave(serie, strcat(name, 'ome.tiff'));
