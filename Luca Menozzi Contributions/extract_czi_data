@@ -1,0 +1,75 @@
+%CZI Data Organizing Function
+%%Function that will organize czi data into a tiff file and
+%%extract and output certain metadata in a structure. This function
+%%depends on other functions included in this git folder.
+% Input:
+%  - CZI data file
+% Output:
+%  - Saves a tiff file in the operating folder and outputs a 
+%    structure of some metadata.
+%  --Luca Menozzi 05 05 20
+%   
+%   Copyright (C) <2020>  <Luca Menozzi>
+% 
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% any later version.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see <https://www.gnu.org/licenses/>.
+% 
+% 
+%%
+function [metadata] = extract_czi_data()
+raw_data = bfopen();
+omeMeta = raw_data{1,4};
+
+% extract metadata
+x_size = omeMeta.getPixelsSizeX(0).getValue(); % image width in pixels
+y_size = omeMeta.getPixelsSizeY(0).getValue(); % image height in pixels
+z_stacks = omeMeta.getPixelsSizeZ(0).getValue(); % number of Z slices
+pixel_size = [x_size, y_size];
+
+physicalSizeX = omeMeta.getPixelsPhysicalSizeX(0).value(ome.units.UNITS.MICROMETER); % in µm
+physicalSizeY = omeMeta.getPixelsPhysicalSizeY(0).value(ome.units.UNITS.MICROMETER); % in µm
+physicalSizeZ = omeMeta.getPixelsPhysicalSizeZ(0).value(ome.units.UNITS.MICROMETER) % in µm
+
+% count and allocate all the series
+size_of_input = size(raw_data);
+num_series = size_of_input(1,1);
+
+for i = 1:1:num_series
+    name = strcat('series', num2str(i));
+    series.(name) = raw_data{i,1};
+end
+
+planes = size(series.series1);
+num_planes = planes(1,1);
+
+% store metadata
+metadata.pixel_size_microns = [physicalSizeX.doubleValue(), physicalSizeY.doubleValue()];
+metadata.num_z_stacks = z_stacks;
+metadata.image_dimensions = pixel_size;
+metadata.num_channels = num_planes/z_stacks;
+
+% display all planes
+saveseries(series.series1, x_size,y_size,z_stacks,3);
+%{
+for i=1:1:10
+    figure
+    cell = struct2cell(series);
+    show_summed_planes(cell{1});
+end
+%}
+%{
+for i = 1:1:num_planes
+    displayimage(series.series1, 1, i, raw_data);
+end
+  %}
+end
